@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* Thème (variables CSS) */
+:root {
+  color-scheme: light;
+
+  --bg: #fbf7ef;
+  --text: #0b0f1a;
+  --muted: rgba(11, 15, 26, 0.7);
+
+  --surface: rgba(255, 255, 255, 0.6);
+  --surface-solid: #ffffff;
+
+  --border: rgba(0, 0, 0, 0.08);
+
+  --chip-bg: #fbf7ef;
+  --chip-text: rgba(11, 15, 26, 0.7);
+
+  --btn: #0b0f1a;
+  --btn-text: #ffffff;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #060712;
+  --text: #e7e9ee;
+  --muted: rgba(231, 233, 238, 0.7);
+
+  --surface: rgba(12, 14, 25, 0.65);
+  --surface-solid: #0c0e19;
+
+  --border: rgba(255, 255, 255, 0.10);
+
+  --chip-bg: rgba(255, 255, 255, 0.06);
+  --chip-text: rgba(231, 233, 238, 0.75);
+
+  --btn: #e7e9ee;
+  --btn-text: #060712;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
