@@ -5,9 +5,9 @@ import {
   SiReact,
   SiPhp,
   SiLaravel,
-  SiNodedotjs,
   SiMongodb,
   SiMysql,
+  SiWordpress,
 } from "react-icons/si";
 
 const frontend = [
@@ -20,13 +20,14 @@ const frontend = [
 const backend = [
   { name: "PHP", icon: SiPhp },
   { name: "Laravel", icon: SiLaravel, core: true },
-  { name: "Node.js", icon: SiNodedotjs },
   { name: "SQL", icon: SiMysql },
   { name: "MongoDB", icon: SiMongodb },
+  { name: "WordPress", icon: SiWordpress, tag: "CMS" },
 ];
 
 function TechPill({ s }) {
   const Icon = s.icon;
+
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-4 py-3 shadow-sm transition hover:-translate-y-[1px] hover:bg-[color:var(--surface)]">
       {/* glow subtil */}
@@ -42,11 +43,19 @@ function TechPill({ s }) {
           </span>
         </div>
 
-        {s.core ? (
-          <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--chip-bg)] px-3 py-1 text-[11px] font-semibold text-[color:var(--chip-text)]">
-            Core
-          </span>
-        ) : null}
+        <div className="flex items-center gap-2">
+          {s.core && (
+            <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--chip-bg)] px-3 py-1 text-[11px] font-semibold text-[color:var(--chip-text)]">
+              Core
+            </span>
+          )}
+
+          {s.tag && (
+            <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-1 text-[11px] font-semibold text-[color:var(--muted)]">
+              {s.tag}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -66,6 +75,7 @@ function SkillCard({ title, desc, skills }) {
             </h3>
             <p className="mt-1 text-sm text-[color:var(--muted)]">{desc}</p>
           </div>
+
           <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface-solid)] px-3 py-1 text-xs text-[color:var(--muted)]">
             {skills.length} skills
           </span>
@@ -84,7 +94,6 @@ function SkillCard({ title, desc, skills }) {
 export default function Skills() {
   return (
     <section id="skills" className="mt-14 md:mt-16">
-      {/* IMPORTANT : aucun "Compétences" ici */}
       <div className="grid gap-6 md:grid-cols-2">
         <SkillCard
           title="Front-end"

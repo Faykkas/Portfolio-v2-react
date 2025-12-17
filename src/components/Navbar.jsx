@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useEffect, useCallback, useState } from "react";
 import { Moon, Sun, X } from "lucide-react";
 import { ThemeContext } from "../context/ThemeContext";
 import logo from "../assets/images/morpion.png";
@@ -14,10 +14,25 @@ export default function Navbar() {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const [open, setOpen] = useState(false);
 
-  // bloque le scroll quand le menu mobile est ouvert
+  const closeMenu = useCallback(() => setOpen(false), []);
+
+  // Bloque le scroll quand le menu est ouvert + cleanup garanti
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const prev = document.body.style.overflow;
+    if (open) document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
+
+  // Fermer au clavier (Escape)
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    if (open) window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, closeMenu]);
 
   return (
     <>
@@ -47,15 +62,22 @@ export default function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* Burger mobile */}
+            {/* Burger mobile (toggle) */}
             <button
-              onClick={() => setOpen(true)}
+              onClick={() => setOpen((v) => !v)}
               className="md:hidden grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--muted)]"
-              aria-label="Ouvrir le menu"
+              aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+              aria-expanded={open}
             >
-              <span className="block h-[2px] w-4 bg-current mb-1" />
-              <span className="block h-[2px] w-4 bg-current mb-1" />
-              <span className="block h-[2px] w-4 bg-current" />
+              {open ? (
+                <X size={18} />
+              ) : (
+                <div className="flex flex-col gap-[3px]">
+                  <span className="block h-[2px] w-4 bg-current" />
+                  <span className="block h-[2px] w-4 bg-current" />
+                  <span className="block h-[2px] w-4 bg-current" />
+                </div>
+              )}
             </button>
 
             {/* Toggle theme */}
@@ -80,23 +102,24 @@ export default function Navbar() {
 
       {/* Menu mobile */}
       {open && (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          onClick={closeMenu} // clic partout = ferme
+          role="dialog"
+          aria-modal="true"
+        >
           {/* overlay */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
-          {/* panneau */}
-          <div className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-[color:var(--bg)] p-6 shadow-xl">
+          {/* panneau (stop propagation pour ne pas fermer quand on clique dedans) */}
+          <div
+            className="absolute right-0 top-0 h-full w-[85%] max-w-sm bg-[color:var(--bg)] p-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between">
-              <img
-                src={logo}
-                alt=""
-                className="h-8 w-auto object-contain"
-              />
+              <img src={logo} alt="" className="h-8 w-auto object-contain" />
               <button
-                onClick={() => setOpen(false)}
+                onClick={closeMenu}
                 className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--muted)]"
                 aria-label="Fermer le menu"
               >
@@ -109,7 +132,7 @@ export default function Navbar() {
                 <a
                   key={l.href}
                   href={l.href}
-                  onClick={() => setOpen(false)}
+                  onClick={closeMenu}
                   className="text-lg font-medium text-[color:var(--text)]"
                 >
                   {l.label}
@@ -119,7 +142,7 @@ export default function Navbar() {
 
             <a
               href="#contact"
-              onClick={() => setOpen(false)}
+              onClick={closeMenu}
               className="mt-10 inline-flex w-full justify-center rounded-full bg-[color:var(--btn)] px-5 py-3 text-sm font-semibold text-[color:var(--btn-text)] shadow-sm"
             >
               Me contacter

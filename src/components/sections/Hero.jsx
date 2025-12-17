@@ -1,9 +1,43 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = () => setReduced(m.matches);
+    onChange();
+    m.addEventListener?.("change", onChange);
+    return () => m.removeEventListener?.("change", onChange);
+  }, []);
+
+  return reduced;
+}
 
 export default function Hero() {
   const ref = useRef(null);
   const [pos, setPos] = useState({ x: 50, y: 35 });
 
+  const reducedMotion = usePrefersReducedMotion();
+
+  // Texte "typewriter" (sobre, pro)
+  const fullLine = useMemo(() => "modernes, rapides et orientées produit.", []);
+  const [typed, setTyped] = useState(reducedMotion ? fullLine : "");
+
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    let i = 0;
+    const t = window.setInterval(() => {
+      i += 1;
+      setTyped(fullLine.slice(0, i));
+      if (i >= fullLine.length) window.clearInterval(t);
+    }, 20);
+
+    return () => window.clearInterval(t);
+  }, [fullLine, reducedMotion]);
+
+  // Spotlight souris
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -49,18 +83,19 @@ export default function Hero() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-500/30" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-rose-500/70" />
               </span>
-              Disponible • Freelance • Front-end React
+              Disponible • Freelance
             </div>
 
             <h1 className="mt-7 text-balance text-4xl font-semibold tracking-tight md:text-6xl">
               <span className="text-[color:var(--text)]">Samuel</span>
               <span className="mt-2 block text-[color:var(--muted)]">
                 Je conçois des interfaces{" "}
-                <span className="relative inline-block text-[color:var(--text)]">
-                  élégantes
-                  <span className="absolute -bottom-1 left-0 h-[6px] w-full rounded-full bg-rose-500/25" />
+                <span className="font-semibold text-[color:var(--text)]">
+                  {typed}
+                  {!reducedMotion && typed.length < fullLine.length ? (
+                    <span className="ml-1 inline-block w-[8px] align-middle opacity-70 animate-[caret_0.9s_infinite]" />
+                  ) : null}
                 </span>
-                , rapides et orientées produit.
               </span>
             </h1>
 
@@ -117,6 +152,17 @@ export default function Hero() {
                 0% { transform: translateY(-8px); opacity: 0; }
                 35% { opacity: 1; }
                 100% { transform: translateY(26px); opacity: 0; }
+              }
+
+              @keyframes caret {
+                0%, 45% { opacity: 0; }
+                50%, 100% { opacity: 1; }
+              }
+
+              .animate-\\[caret_0\\.9s_infinite\\] {
+                background: currentColor;
+                height: 1.05em;
+                border-radius: 2px;
               }
             `}</style>
           </div>
